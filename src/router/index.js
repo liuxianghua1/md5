@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import index from '../views/index.vue'
-import About from '../views/About.vue'
+
+// Md5解码页面
+import CreateUser from '../views/Md5/CreateUser'
 
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push(location) {
@@ -13,7 +15,7 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/', name: 'index', component: index, 
   children: [
-    { path: '/about', name: 'about', component: About },
+    { path: '/CreateUser', name: 'CreateUser', component: CreateUser },
   ]},
 
 ]
