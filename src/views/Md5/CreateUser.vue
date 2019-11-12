@@ -10,7 +10,7 @@
 			</el-form-item>
 	
 			<el-form-item label="密码" prop="password">
-				<el-input placeholder="请输入密码账号" v-model="ruleForm.password"></el-input>
+				<el-input placeholder="请输入密码" type="password" v-model="ruleForm.password"></el-input>
 			</el-form-item>
 	
 			<el-form-item label="初始查询数">
@@ -63,10 +63,16 @@ export default {
 		};
 	},
 	methods: {
+		async Create() {
+			const res = await this.$axios.post('/user/insert.zul', this.ruleForm, {
+				header: "application/json;charset=utf8"
+			});
+			console.log(res);
+		},
 		submitForm(formName) {
 			this.$refs[formName].validate(valid => {
 				if (valid) {
-					// alert("submit!");
+					this.Create();
 				} else {
 					// console.log("error submit!!");
 					return false;

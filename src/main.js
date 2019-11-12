@@ -5,6 +5,8 @@ import './plugins/element.js'
 import router from './router'
 
 Vue.config.productionTip = false
+import mock from '../src/plugins/mock'
+Vue.prototype.$mock = mock;
 
 new Vue({
   router,

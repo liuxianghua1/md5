@@ -17,7 +17,7 @@
               <i class="el-icon-message"></i>用户管理
             </template>
               <el-menu-item index="/CreateUser">创建用户</el-menu-item>
-              <el-menu-item index="1-2">用户管理</el-menu-item>
+              <el-menu-item index="/UserList">用户管理</el-menu-item>
           </el-submenu>
 
           <el-submenu index="3">
