@@ -11,7 +11,7 @@ import axios from "axios";
 let config = {
   // baseURL: process.env.baseURL || process.env.apiUrl || ""
   // baseURL: 'http://rap2api.taobao.org/app/mock/231871/'
-  baseURL: 'http://192.168.0.77:8080/xsl-decode'
+  // baseURL: 'http://192.168.0.77:8080/xsl-decode'
   // timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };

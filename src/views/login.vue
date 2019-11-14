@@ -50,14 +50,13 @@ export default {
 
         async login() {
             try {
-                // console.log("!");
-                const res = await this.$axios.post('user/login.zul', this.model)
-                // console.log(res);
+                const res = await this.$http.post('user/login.zul', this.model,{
+                    header: "application/json;charset=utf8"
+                })
                 if (res.data[0].token) {
-                    this.$message({ type: "success", message: "登录成功!" });
-                    sessionStorage.tokendemo = res.data.token;
-                    localStorage.token = res.data.token;
+                    localStorage.token = res.data[0].token;
                     this.$router.push("/");
+                    this.$message({ type: "success", message: "登录成功!" });
                 } else if (res.data[0].code == 5) {
                     this.$message({ type: "error", message: "用户名不存在!" });
                 } else {

@@ -5,10 +5,12 @@ import './plugins/element.js'
 import router from './router'
 
 Vue.config.productionTip = false
-import mock from '../src/plugins/mock'
-Vue.prototype.$mock = mock;
+import http from './plugins/http'
+import store from './store'
+Vue.prototype.$http = http;
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')
