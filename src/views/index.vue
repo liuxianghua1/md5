@@ -29,7 +29,7 @@
               <i class="el-icon-message"></i>
               流水记录
             </template>
-            <el-menu-item index="1-2">流水记录</el-menu-item>
+            <el-menu-item index="/Record">流水记录</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -105,6 +105,7 @@ export default {
           Vue.prototype.User = res.data[0];
           this.$store.commit("SetUser", res.data[0]);
           this.$store.commit("set_roleid", res.data[0].roleid);
+          localStorage.setItem("roleid", res.data[0].roleid);
           this.User = res.data[0];
         }
       } catch (e) {
@@ -121,6 +122,9 @@ export default {
   },
   created() {
     this.fetch();
+    window.onbeforeunload = function() {
+      localStorage.clear();
+    };
   }
 };
 </script>

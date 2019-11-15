@@ -20,7 +20,7 @@
       </el-form-item>
 
       <el-form-item label="初始查询数">
-        <el-input-number v-model="ruleForm.money" :min="0"></el-input-number>
+        <el-input-number v-model="ruleForm.article" :min="0"></el-input-number>
       </el-form-item>
 
       <el-form-item
@@ -70,7 +70,7 @@ export default {
         password: "",
         roleid: "5",
         pid: "",
-        money: 0
+        article: 0
       },
       rules: {
         username: [{ required: true, message: "请输入姓名", trigger: "blur" }],
@@ -116,11 +116,14 @@ export default {
       const res = await this.$http.post("/user/insert.zul", this.ruleForm, {
         header: "application/json;charset=utf8"
       });
+      console.log(res);
       if (res.data[0].code == 0) {
         this.$message({ type: "success", message: "创建用户成功!" });
         this.$router.push("/UserList");
       } else if (res.data[0].code == 3) {
         this.$message({ type: "error", message: "账号已存在!" });
+      } else if (res.data[0].code == 13) {
+        this.$message({ type: "error", message: "账户条数余额不足!" });
       } else {
         this.$message({ type: "error", message: "系统异常!" });
       }
