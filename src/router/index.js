@@ -42,6 +42,9 @@ router.beforeEach((to, from, next) => {
   // window.addEventListener("beforeunload", () => {
   //   sessionStorage.setItem("roleid", store.state.roleid)
   // })
+  // let info = store.state.roleid
+  // let infoLength = Object.keys(info).length === 0
+  // console.log(infoLength);
   if (!to.meta.isPublic && !localStorage.token) {
     Message({ type: "error", message: "请先登录!" });
     return next('/login')

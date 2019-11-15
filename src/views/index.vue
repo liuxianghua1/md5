@@ -11,7 +11,10 @@
             <el-menu-item index="/about">Md5解码</el-menu-item>
             <el-menu-item index="1-2">Md5解码</el-menu-item>
           </el-submenu>
-          <el-submenu index="2">
+          <el-submenu
+            v-if="this.$store.getters.get_roleid.roleid == 1 || this.$store.getters.get_roleid.roleid == 2"
+            index="2"
+          >
             <template slot="title">
               <i class="el-icon-message"></i>
               用户管理
@@ -26,8 +29,7 @@
               <i class="el-icon-message"></i>
               流水记录
             </template>
-
-            <el-menu-item index="1-2">历史记录</el-menu-item>
+            <el-menu-item index="1-2">流水记录</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
