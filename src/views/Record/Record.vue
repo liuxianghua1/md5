@@ -12,6 +12,7 @@
       <el-table-column prop="uname" label="被充值用户"></el-table-column>
       <el-table-column prop="investname" label="充值者"></el-table-column>
       <el-table-column prop="article" label="条数"></el-table-column>
+      <el-table-column prop="createtime" label="时间"></el-table-column>
     </el-table>
     <el-pagination
       :current-page.sync="pagination.page_index"

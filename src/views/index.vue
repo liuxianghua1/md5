@@ -42,6 +42,7 @@
               <i class="el-icon-setting"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item icon="el-icon-money">余额:{{this.$store.state.article}}</el-dropdown-item>
               <el-dropdown-item @click.native="swtichs" icon="el-icon-copy-document">切换账号</el-dropdown-item>
               <el-dropdown-item @click.native="exit" icon="el-icon-house">注销</el-dropdown-item>
             </el-dropdown-menu>
@@ -81,7 +82,8 @@ export default {
   data() {
     return {
       tableData: [],
-      User: []
+      User: [],
+      article: 1
     };
   },
   methods: {
@@ -107,6 +109,18 @@ export default {
           this.$store.commit("set_roleid", res.data[0].roleid);
           localStorage.setItem("roleid", res.data[0].roleid);
           this.User = res.data[0];
+          const money = await this.$http.post(
+            "user/query.zul",
+            {
+              id: this.User.id
+            },
+            {
+              headers: {
+                "Content-Type": "application/json;charset=UTF-8"
+              }
+            }
+          );
+          this.$store.commit("article", money.data.article);
         }
       } catch (e) {
         this.$router.push("/login");
@@ -122,9 +136,9 @@ export default {
   },
   created() {
     this.fetch();
-    window.onbeforeunload = function() {
-      localStorage.clear();
-    };
+    // window.onbeforeunload = function(e) {
+    //   localStorage.clear();
+    // };
   }
 };
 </script>

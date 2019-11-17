@@ -10,17 +10,19 @@
         width="50"
       ></el-table-column>
       <el-table-column prop="username" label="姓名"></el-table-column>
+      <el-table-column prop="article" label="剩余条数"></el-table-column>
       <el-table-column prop="loginname" label="登录名"></el-table-column>
       <el-table-column prop="rolename" label="权限"></el-table-column>
       <el-table-column prop="pname" label="上级代理"></el-table-column>
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
-          <el-button plain size="medium" type="success">充值</el-button>
+          <el-button plain size="medium" type="success" @click="modifyArticle1(scope.row)">充值</el-button>
           <el-button plain size="medium" @click="modifyUser(scope.row)" type="primary">修改</el-button>
           <el-button plain size="medium" @click="remove(scope.row)" type="danger">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
     <el-pagination
       :current-page.sync="pagination.page_index"
       @current-change="handleCurrentChange"
@@ -29,6 +31,7 @@
       :total="pagination.total"
       style="margin-top: 20px;text-align: center;"
     ></el-pagination>
+    <!-- 修改用户 -->
     <el-dialog title="修改用户" :visible.sync="dialogFormVisible">
       <el-form :rules="rules" :model="form">
         <el-form-item prop="username" label="姓名" :label-width="formLabelWidth">
@@ -46,6 +49,18 @@
         <el-button type="primary" @click="modifySave">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 充值 -->
+    <el-dialog title="用户充值" :visible.sync="dialogFormVisible1">
+      <el-form :model="form1">
+        <el-form-item label="充值数量" :label-width="formLabelWidth">
+          <el-input-number v-model="form1.article" :min="1" label="充值数量"></el-input-number>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible1 = false">取 消</el-button>
+        <el-button type="primary" @click="modifyArticle">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -55,11 +70,16 @@ export default {
     return {
       tableData: [],
       dialogFormVisible: false,
+      dialogFormVisible1: false,
       form: {
         id: "",
         username: "",
         loginname: "",
         password: ""
+      },
+      form1: {
+        article: 1,
+        id: ""
       },
       formLabelWidth: "120px",
       rules: {
@@ -79,7 +99,7 @@ export default {
   },
   methods: {
     async handleCurrentChange(page) {
-      console.log(page)
+      console.log(page);
     },
     closeDilog: function(form) {
       this.dialogFormVisible = false;
@@ -91,10 +111,34 @@ export default {
       this.dialogFormVisible = false;
       const res = await this.$http.post("user/update.zul", this.form);
       if (res.data.code == 0) {
-        this.$message({ type: "success", message: "工单详情数据保存成功" });
+        this.$message({ type: "success", message: "数据保存成功" });
         this.fetch();
       } else {
-        this.$message({ type: "error", message: "工单详情数据保存成功" });
+        this.$message({ type: "error", message: "数据保存失败" });
+      }
+    },
+    async modifyArticle() {
+      this.dialogFormVisible1 = false;
+      const res = await this.$http.post("financial/invest.zul", this.form1);
+      const money = await this.$http.post(
+        "user/query.zul",
+        {
+          id: this.User.id
+        },
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          }
+        }
+      );
+      this.$store.commit("article", money.data.article);
+      if (res.data[0].code == 0) {
+        this.$message({ type: "success", message: "数据保存成功" });
+        this.fetch();
+      } else if (res.data[0].code == 13) {
+        this.$message({ type: "error", message: "账户余额不足" });
+      } else {
+        this.$message({ type: "error", message: "数据保存失败" });
       }
     },
     async fetch() {
@@ -110,6 +154,10 @@ export default {
       return (
         (this.pagination.page_index - 1) * this.pagination.page_size + index + 1
       );
+    },
+    modifyArticle1(row) {
+      this.form1.id = row.id;
+      this.dialogFormVisible1 = true;
     },
     async modifyUser(row) {
       this.dialogFormVisible = true;

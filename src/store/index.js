@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     roleid: "",
     User: [],
+    article: "",
     auth: false,
     token: window.localStorage.getItem('token'),
     userInfo: {}
@@ -29,6 +30,9 @@ export default new Vuex.Store({
     },
     SetUser(context, msg) {
       context.User = msg;
+    },
+    article(context, msg) {
+      context.article = msg;
     },
   },
   getters: {

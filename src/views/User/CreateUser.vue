@@ -23,11 +23,12 @@
         <el-input-number v-model="ruleForm.article" :min="0"></el-input-number>
       </el-form-item>
 
-      <el-form-item
-        prop="pid"
-        v-if="ruleForm.roleid == 2 || ruleForm.roleid == 1 ? false : true"
-        label="上级代理"
-      >
+      <el-form-item label="余额">
+        <el-link icon="el-icon-money" disabled>剩余可分配条数:{{this.$store.state.article}}</el-link>
+      </el-form-item>
+
+      <el-form-item prop="pid" v-if="ruleForm.roleid == 5 && roleid == 1" label="上级代理">
+        <!-- && localStorage.roleid == 1 -->
         <el-select v-model="ruleForm.pid" clearable placeholder="请选择上级代理">
           <el-option v-for="item in options" :key="item.id" :label="item.username" :value="item.id"></el-option>
         </el-select>
@@ -62,6 +63,7 @@
 export default {
   data() {
     return {
+      roleid: "",
       options: [],
       User: [],
       ruleForm: {
@@ -86,7 +88,9 @@ export default {
   methods: {
     RadioChange() {
       if (this.ruleForm.roleid == 2 || this.ruleForm.roleid == 1) {
-        this.ruleForm.pid = this.User.id.toString();
+        this.ruleForm.pid = this.User.id;
+      } else if (this.ruleForm.roleid == 5 && this.$store.state.roleid == 2) {
+        this.ruleForm.pid = this.User.id;
       } else if (this.ruleForm.roleid == 5) {
         this.ruleForm.pid = "";
       }
@@ -113,13 +117,29 @@ export default {
       }
     },
     async Create() {
+      if (this.ruleForm.roleid == 2 || this.ruleForm.roleid == 1) {
+        this.ruleForm.pid = this.User.id;
+      } else if (this.ruleForm.roleid == 5 && this.$store.state.roleid == 2) {
+        this.ruleForm.pid = this.User.id;
+      }
       const res = await this.$http.post("/user/insert.zul", this.ruleForm, {
         header: "application/json;charset=utf8"
       });
-      console.log(res);
       if (res.data[0].code == 0) {
         this.$message({ type: "success", message: "创建用户成功!" });
         this.$router.push("/UserList");
+        const money = await this.$http.post(
+          "user/query.zul",
+          {
+            id: this.User.id
+          },
+          {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            }
+          }
+        );
+        this.$store.commit("article", money.data.article);
       } else if (res.data[0].code == 3) {
         this.$message({ type: "error", message: "账号已存在!" });
       } else if (res.data[0].code == 13) {
@@ -142,6 +162,7 @@ export default {
     },
     async roleid_fetch() {
       let roleid = { roleid: 2 };
+      this.roleid = localStorage.roleid;
       const res = await this.$http.post("user/role.zul", roleid, {
         header: "application/json;charset=utf8"
       });
