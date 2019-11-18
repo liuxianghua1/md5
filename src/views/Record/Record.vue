@@ -72,7 +72,15 @@ export default {
   },
   methods: {
     async handleCurrentChange(page) {
-      console.log(page)
+      const res = await this.$http.post("investMoney/query.zul",{
+          page
+      },{
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      });
+      this.pagination.total = res.data.records;
+      this.tableData = res.data.rows;
     },
     closeDilog: function(form) {
       this.dialogFormVisible = false;
@@ -96,7 +104,6 @@ export default {
           "Content-Type": "application/json;charset=UTF-8"
         }
       });
-      console.log(res)
       this.pagination.total = res.data.records;
       this.tableData = res.data.rows;
     },

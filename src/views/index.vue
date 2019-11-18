@@ -9,7 +9,7 @@
             </template>
 
             <el-menu-item index="/about">Md5解码</el-menu-item>
-            <el-menu-item index="1-2">Md5解码</el-menu-item>
+            <!-- <el-menu-item index="1-2">Md5解码</el-menu-item> -->
           </el-submenu>
           <el-submenu
             v-if="this.$store.getters.get_roleid.roleid == 1 || this.$store.getters.get_roleid.roleid == 2"
