@@ -14,6 +14,9 @@ import UserList from '../views/User/UserList'
 // 流水记录
 import Record from '../views/Record/Record'
 
+// 解码记录
+import DecodingRecord from '../views/Decoding/DecodingRecord'
+import DecodingFile from '../views/Decoding/DecodingFile'
 
 
 const originalPush = VueRouter.prototype.push
@@ -28,13 +31,13 @@ const routes = [
   {
     path: '/', name: 'index', component: index,
     children: [
-      {
-        path: '/CreateUser', name: 'createuser', component: CreateUser, meta: { roleid: [1, 2] }
-      },
+      { path: '/CreateUser', name: 'createuser', component: CreateUser, meta: { roleid: [1, 2] } },
       {
         path: '/UserList', name: 'userlist', component: UserList, meta: { roleid: [1, 2] }
       },
       { path: '/Record', name: 'record', component: Record, },
+      { path: '/DecodingRecord', name: 'decodingrecord', component: DecodingRecord, },
+      { path: '/DecodingFile', name: 'decodingfile', component: DecodingFile, },
     ]
   },
 
@@ -54,7 +57,7 @@ router.beforeEach((to, from, next) => {
     return next('/login')
   }
   if (to.fullPath == '/UserList' || to.fullPath == '/CreateUser') {
-     if (!to.meta.roleid.includes(Number(localStorage.roleid))) {
+    if (!to.meta.roleid.includes(Number(localStorage.roleid))) {
       return next('/#/')
     }
   }

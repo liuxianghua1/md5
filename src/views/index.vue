@@ -2,13 +2,14 @@
   <div>
     <el-container border style="height:100vh;">
       <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-        <el-menu router :default-active="$route.path" :default-openeds="['1-2']">
+        <el-menu router unique-opened :default-active="$route.path">
           <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-message"></i>Md5解码
             </template>
 
-            <el-menu-item index="/about">Md5解码</el-menu-item>
+            <el-menu-item index="/DecodingFile">Md5解码</el-menu-item>
+            <el-menu-item index="/DecodingRecord">解码记录</el-menu-item>
             <!-- <el-menu-item index="1-2">Md5解码</el-menu-item> -->
           </el-submenu>
           <el-submenu
@@ -49,7 +50,7 @@
           </el-dropdown>
         </el-header>
         <el-main>
-          <router-view />
+          <router-view :key="$route.path"/>
         </el-main>
       </el-container>
     </el-container>
