@@ -1,5 +1,28 @@
 <template>
   <div>
+    <div>
+      <el-input
+        class="search"
+        v-model="decodename"
+        clearable
+        prefix-icon="el-icon-search"
+        placeholder="输入解码文件搜索"
+      />
+      <el-date-picker
+        class="search"
+        value-format="yyyy-MM-dd HH:mm:ss"
+        v-model="starttime"
+        type="datetime"
+        placeholder="选择解码开始时间"
+      ></el-date-picker>
+      <el-date-picker
+        class="search"
+        value-format="yyyy-MM-dd HH:mm:ss"
+        v-model="endtime"
+        type="datetime"
+        placeholder="选择解码结束时间"
+      ></el-date-picker>
+    </div>
     <el-table :data="tableData" style="width: 100%">
       <el-table-column
         label="序号"
@@ -9,10 +32,10 @@
         erflow-tooltip
         width="50"
       ></el-table-column>
-      <el-table-column prop="uname" label="被充值用户"></el-table-column>
-      <el-table-column prop="investname" label="充值者"></el-table-column>
-      <el-table-column prop="article" label="条数"></el-table-column>
-      <el-table-column prop="createtime" label="时间"></el-table-column>
+      <el-table-column prop="decodename" label="解码文件"></el-table-column>
+      <el-table-column prop="decodenum" label="消耗条数"></el-table-column>
+      <el-table-column prop="username" label="解码用户"></el-table-column>
+      <el-table-column prop="updatetime" label="解码时间"></el-table-column>
     </el-table>
     <el-pagination
       :current-page.sync="pagination.page_index"
@@ -26,6 +49,7 @@
 </template>
 
 <script>
+let _ = require("lodash");
 export default {
   data() {
     return {
@@ -34,15 +58,65 @@ export default {
         total: 1,
         page_size: 20,
         page_index: 0
-      }
+      },
+      decodename: "",
+      starttime: "",
+      endtime: ""
     };
   },
+
   methods: {
     async handleCurrentChange(page) {
-      const res = await this.$http.post(
-        "investMoney/query.zul",
+      let res;
+      if (
+        this.decodename.length ||
+        this.starttime.length ||
+        this.endtime.length >= 1
+      ) {
+        res = await this.$http.post(
+          "decodeRecode/query.zul",
+          {
+            decodename: this.decodename,
+            starttime: this.starttime,
+            endtime: this.endtime,
+            page
+          },
+          {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            }
+          }
+        );
+      } else {
+        res = await this.$http.post(
+          "decodeRecode/query.zul",
+          {
+            page
+          },
+          {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8"
+            }
+          }
+        );
+      }
+      this.pagination.total = res.data.records;
+      this.tableData = res.data.rows;
+    },
+    async fetch(decodename, starttime, endtime) {
+      let res;
+      if (starttime == null) {
+        this.starttime = "";
+      }
+      if (endtime == null) {
+        this.endtime = "";
+      }
+      res = await this.$http.post(
+        "decodeRecode/query.zul",
         {
-          page
+          decodename: decodename,
+          starttime: starttime,
+          endtime: endtime
         },
         {
           headers: {
@@ -53,23 +127,36 @@ export default {
       this.pagination.total = res.data.records;
       this.tableData = res.data.rows;
     },
-    async fetch() {
-      const res = await this.$http.post("investMoney/query.zul", {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8"
-        }
-      });
-      this.pagination.total = res.data.records;
-      this.tableData = res.data.rows;
-    },
     table_index(index) {
       return (
         (this.pagination.page_index - 1) * this.pagination.page_size + index + 1
       );
-    }
+    },
+    decodenameSearch: _.debounce(function(decodename, starttime, endtime) {
+      this.fetch(decodename, starttime, endtime);
+    }, 1000)
   },
   created() {
     this.fetch();
+  },
+  watch: {
+    decodename: function(val) {
+      this.decodenameSearch(val, this.starttime, this.endtime);
+    },
+    starttime: function(val) {
+      this.decodenameSearch(this.decodename, val, this.endtime);
+    },
+    endtime: function(val) {
+      this.decodenameSearch(this.decodename, this.starttime, val);
+    }
   }
 };
 </script>
+
+<style>
+.search {
+  width: 250px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+</style>
