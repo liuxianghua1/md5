@@ -1,5 +1,14 @@
 <template>
   <div>
+    <div>
+      <el-input
+        class="search"
+        v-model="username"
+        clearable
+        prefix-icon="el-icon-search"
+        placeholder="输入用户姓名搜索"
+      />
+    </div>
     <el-table :data="tableData" style="width: 100%">
       <el-table-column
         label="序号"
@@ -65,10 +74,12 @@
 </template>
 
 <script>
+let _ = require("lodash");
 export default {
   data() {
     return {
       tableData: [],
+      username: "",
       dialogFormVisible: false,
       dialogFormVisible1: false,
       form: {
@@ -99,9 +110,13 @@ export default {
   },
   methods: {
     async handleCurrentChange(page) {
-      const res = await this.$http.post("user/query.zul",{
+      const res = await this.$http.post(
+        "user/query.zul",
+        {
+          username: this.username,
           page
-        },{
+        },
+        {
           headers: {
             "Content-Type": "application/json;charset=UTF-8"
           }
@@ -150,12 +165,18 @@ export default {
         this.$message({ type: "error", message: "数据保存失败" });
       }
     },
-    async fetch() {
-      const res = await this.$http.post("user/query.zul", {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8"
+    async fetch(username) {
+      const res = await this.$http.post(
+        "user/query.zul",
+        {
+          username: username
+        },
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8"
+          }
         }
-      });
+      );
       this.pagination.total = res.data.records;
       this.tableData = res.data.rows;
     },
@@ -210,10 +231,18 @@ export default {
             message: "已取消删除"
           });
         });
-    }
+    },
+    usernameSearch: _.debounce(function(username) {
+      this.fetch(username);
+    }, 1000)
   },
   created() {
     this.fetch();
+  },
+  watch: {
+    username: function(val) {
+      this.usernameSearch(val);
+    }
   }
 };
 </script>
