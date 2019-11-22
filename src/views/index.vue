@@ -28,7 +28,7 @@
               <router-link style="text-align: center;" to="/">
                 <h1
                   style="color: #364149;font-weight: 300;font-size: 1.3rem;font-family: Source Sans Pro,Helvetica Neue,Arial,sans-serif;"
-                >工单提交平台</h1>
+                >Md5解码平台</h1>
               </router-link>
             </template>
             <el-submenu index="1">
@@ -66,16 +66,36 @@
       <el-main>
         <div v-if="this.$route.path == '/'">
           <el-col :span="12">
-            <ve-scatter :data="chartData"></ve-scatter>
+            <ve-line
+              :loading="loading"
+              :data="consumPtion"
+              :extend="extend"
+              :settings="chartSettings"
+            ></ve-line>
           </el-col>
           <el-col :span="12">
-            <ve-funnel :data="chartData"></ve-funnel>
+            <ve-funnel
+              :loading="loading"
+              :data="consumPtion"
+              :extend="extend"
+              :settings="chartSettings"
+            ></ve-funnel>
           </el-col>
           <el-col :span="12">
-            <ve-waterfall :data="chartData"></ve-waterfall>
+            <ve-waterfall
+              :loading="loading"
+              :data="consumPtion"
+              :extend="extend"
+              :settings="chartSettings"
+            ></ve-waterfall>
           </el-col>
           <el-col :span="12">
-            <ve-bar :data="chartData"></ve-bar>
+            <ve-bar
+              :loading="loading"
+              :data="consumPtion"
+              :extend="extend"
+              :settings="chartSettings"
+            ></ve-bar>
           </el-col>
         </div>
         <router-view :key="$route.path" />
@@ -96,9 +116,27 @@
 </style>
 
 <script>
+import "v-charts/lib/style.css";
 import Vue from "vue";
 export default {
   data() {
+    this.chartSettings = {
+      labelMap: {
+        consumPtion: "消费条数",
+        username: "用户",
+        month: "月份"
+      },
+      area: true
+    };
+    this.extend = {
+      series: {
+        label: {
+          normal: {
+            show: true
+          }
+        }
+      }
+    };
     return {
       tableData: [],
       User: [],
@@ -113,12 +151,28 @@ export default {
           { 日期: "1/5", 访问用户: 3123, 年龄: 15, 下单用户: 4564 },
           { 日期: "1/6", 访问用户: 2323, 年龄: 20, 下单用户: 6537 }
         ]
-      }
+      },
+      consumPtion: {
+        columns: ["username", "consumPtion", "month"],
+        rows: []
+      },
+      loading: true
     };
   },
   methods: {
     swtichs() {
       this.$router.push("/login");
+    },
+    async consumPtionFetch() {
+      const res = await this.$http.post("investMoney/consumption.zul", {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      });
+      this.consumPtion.rows = res.data;
+      if (this.consumPtion.rows.length >= 1) {
+        this.loading = false;
+      }
     },
     async fetch() {
       try {
@@ -138,6 +192,7 @@ export default {
           this.$store.commit("SetUser", res.data[0]);
           this.$store.commit("set_roleid", res.data[0].roleid);
           localStorage.setItem("roleid", res.data[0].roleid);
+          localStorage.setItem("id", res.data[0].id);
           this.User = res.data[0];
           const money = await this.$http.post(
             "user/query.zul",
@@ -166,6 +221,7 @@ export default {
   },
   created() {
     this.fetch();
+    this.consumPtionFetch();
     // window.onbeforeunload = function(e) {
     //   localStorage.clear();
     // };

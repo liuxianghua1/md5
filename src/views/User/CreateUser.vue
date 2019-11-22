@@ -35,12 +35,12 @@
       </el-form-item>
 
       <el-form-item label="权限">
-        <el-radio
+        <!-- <el-radio
           @change="RadioChange"
           v-model="ruleForm.roleid"
           v-if="this.User.roleid == 1"
           label="1"
-        >管理员</el-radio>
+        >管理员</el-radio> -->
         <el-radio
           @change="RadioChange"
           v-model="ruleForm.roleid"
