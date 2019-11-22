@@ -11,8 +11,8 @@
                 </el-form-item>
     
                 <el-form-item>
-                    <el-button type="primary" @click="submitForm('model')">提交</el-button>
-                    <el-button @click="resetForm('model')">重置</el-button>
+                    <el-button type="primary" round @click="submitForm('model')">提交</el-button>
+                    <el-button round @click="resetForm('model')">重置</el-button>
                 </el-form-item>
             </el-form>
         </el-card>
@@ -73,6 +73,10 @@ export default {
 <style>
 .login-card {
     width: 25rem;
-    margin: 8rem auto;
+    margin: 11rem auto;
+    border-radius: 20px;
+}
+.demo-ruleForm1 .el-form-item .el-input .el-input__inner {
+    border-radius: 20px;
 }
 </style>

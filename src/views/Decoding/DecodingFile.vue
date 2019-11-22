@@ -50,77 +50,94 @@ export default {
   data() {
     return {
       fileList: [],
+      fullscreenLoading: false,
       res: "",
       result: ""
     };
   },
   methods: {
+    loading(length) {
+      const loading = this.$loading({
+        lock: true,
+        text: "文件上传中",
+        spinner: "el-icon-loading",
+        background: "hsla(0,0%,100%,.9)"
+      });
+      if (length == 0) {
+        loading.close();
+      }
+    },
     uploadFile() {
       let formData = new FormData();
+      this.loading(this.fileList.length);
       if (this.fileList.length > 0) {
         this.fileList.forEach(file => {
           formData.append("file", file);
         });
         if (formData.getAll("file").length == this.length && this.length > 0) {
-          this.$http.post("decodeRecode/decodeMore.zul", formData).then(res => {
-            this.fileList = [];
-            //此处重置文件中间存储变量是为了相同文件能够重复传递
-            switch (res.data[0].code) {
-              case 0:
-                this.res = res.data[0].path;
-                this.$message({
-                  message: "上传成功,可以进行下载!",
-                  type: "success"
-                });
-                this.result = encodeURIComponent(this.res);
-                window.open(
-                  `http://192.168.99.91:8080/xsl-decode/decodeRecode/downMd5.zul?path=${this.result}&id=${localStorage.id}`
-                );
-                this.fileList = [];
-                break;
-              case 16:
-                this.fileList = [];
-                this.$message({
-                  message: "未查到该解码数据!",
-                  type: "error"
-                });
-                break;
-              case 15:
-                this.fileList = [];
-                this.$message({
-                  message: "文件异常!",
-                  type: "error"
-                });
-                break;
-              case 14:
-                this.$message({
-                  message: "账户不存在该用户!",
-                  type: "error"
-                });
-                this.fileList = [];
-                break;
-              case 13:
-                this.$message({
-                  message: "余额不足请充值!",
-                  type: "error"
-                });
-                this.fileList = [];
-                break;
-              case 1:
-                this.$message({
-                  message: "内容有误,请换个文件!",
-                  type: "error"
-                });
-                this.fileList = [];
-                break;
-              default:
-                this.$message({
-                  message: "服务器偷懒了,请稍后再试!",
-                  type: "error"
-                });
-                this.fileList = [];
-            }
-          });
+          this.$http
+            .post("decodeRecode/decodeMoreThread.zul", formData)
+            .then(res => {
+              this.fileList = [];
+              this.loading(this.fileList.length);
+              //此处重置文件中间存储变量是为了相同文件能够重复传递
+              switch (res.data[0].code) {
+                case 0:
+                  this.res = res.data[0].path;
+                  this.fileList = [];
+                  this.$message({
+                    message: "上传成功,可以前去解码记录进行下载!",
+                    type: "success"
+                  });
+                  this.result = encodeURIComponent(this.res);
+                  // window.open(
+                  //   `http://192.168.99.91:8080/xsl-decode/decodeRecode/downMd5.zul?path=${this.result}&id=${localStorage.id}`
+                  // );
+                  // console.log(this.fileList.length)
+                  break;
+                case 16:
+                  this.fileList = [];
+                  this.$message({
+                    message: "未查到该解码数据!",
+                    type: "error"
+                  });
+                  break;
+                case 15:
+                  this.fileList = [];
+                  this.$message({
+                    message: "文件异常!",
+                    type: "error"
+                  });
+                  break;
+                case 14:
+                  this.$message({
+                    message: "账户不存在该用户!",
+                    type: "error"
+                  });
+                  this.fileList = [];
+                  break;
+                case 13:
+                  this.$message({
+                    message: "余额不足请充值!",
+                    type: "error"
+                  });
+                  this.fileList = [];
+                  break;
+                case 1:
+                  this.$message({
+                    message: "内容有误,请换个文件!",
+                    type: "error"
+                  });
+                  this.fileList = [];
+                  break;
+                default:
+                  this.$message({
+                    message: "服务器偷懒了,请稍后再试!",
+                    type: "error"
+                  });
+                  this.fileList = [];
+              }
+            });
         }
       }
     },
@@ -138,49 +155,6 @@ export default {
       }
       return false;
     },
-    // async demo(res, file, fileList) {
-    //   if (res[0].code == 1) {
-    //     this.$message({
-    //       message: "内容有误,请换个文件!",
-    //       type: "error"
-    //     });
-    //     this.fileList = [];
-    //   } else if (res[0].code == 13) {
-    //     this.$message({
-    //       message: "余额不足请充值!",
-    //       type: "error"
-    //     });
-    //   } else if (res[0].code == 14) {
-    //     this.$message({
-    //       message: "账户不存在该用户!",
-    //       type: "error"
-    //     });
-    //   } else if (res[0].code == 15) {
-    //     this.$message({
-    //       message: "文件异常!",
-    //       type: "error"
-    //     });
-    //   } else if (res[0].code == 16) {
-    //     this.$message({
-    //       message: "未查到该解码数据!",
-    //       type: "error"
-    //     });
-    //   } else if (res[0].code == 0) {
-    //     this.fileList = fileList;
-    //     this.res = res[0].path;
-    //     this.$message({
-    //       message: "上传成功,可以进行下载!",
-    //       type: "success"
-    //     });
-    //     let demo = encodeURIComponent(this.res);
-    //     window.open(
-    //       `http://192.168.99.91:8080/xsl-decode/decodeRecode/downMd5.zul?path=${demo}&id=${localStorage.id}`
-    //     );
-    //     // window.open(
-    //     //   `http://192.168.0.100:8081/xsl-decode/decodeRecode/downMd5.zul?path=${demo}`
-    //     // );
-    //   }
-    // },
     handleExceed(files, fileList) {
       this.$message.warning(
         `当前限制选择 5 个文件，本次选择了 ${
@@ -216,6 +190,7 @@ export default {
         Authorization: "Bearer " + localStorage.token
       };
     }
-  }
+  },
+  created() {}
 };
 </script>

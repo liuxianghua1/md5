@@ -36,6 +36,12 @@
       <el-table-column prop="decodenum" label="消耗条数"></el-table-column>
       <el-table-column prop="username" label="解码用户"></el-table-column>
       <el-table-column prop="updatetime" label="解码时间"></el-table-column>
+      <el-table-column fixed="right" label="操作">
+        <template slot-scope="scope">
+          <el-button size="medium" v-if="scope.row.status == 0" @click="download(scope.row)" type="primary">下载</el-button>
+          <el-link v-else type="primary" disabled >已下载</el-link>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       :current-page.sync="pagination.page_index"
@@ -66,6 +72,12 @@ export default {
   },
 
   methods: {
+    download(row) {
+      window.open(
+        `http://192.168.99.91:8080/xsl-decode/decodeRecode/downMd5.zul?id=${row.id}&uid=${localStorage.id}`
+      );
+      this.fetch();
+    },
     async handleCurrentChange(page) {
       let res;
       if (
@@ -124,6 +136,7 @@ export default {
           }
         }
       );
+      console.log(res);
       this.pagination.total = res.data.records;
       this.tableData = res.data.rows;
     },
