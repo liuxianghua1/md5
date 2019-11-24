@@ -29,7 +29,7 @@
         class="upload-demo"
         :on-exceed="handleExceed"
         :before-upload="beforeUpload"
-        :limit="5"
+        :limit="20"
         :file-list="fileList"
         :on-change="change"
         multiple
@@ -157,7 +157,7 @@ export default {
     },
     handleExceed(files, fileList) {
       this.$message.warning(
-        `当前限制选择 5 个文件，本次选择了 ${
+        `当前限制选择 20 个文件，本次选择了 ${
           files.length
         } 个文件，共选择了 ${files.length + fileList.length} 个文件`
       );

@@ -28,7 +28,6 @@
       </el-form-item>
 
       <el-form-item prop="pid" v-if="ruleForm.roleid == 5 && roleid == 1" label="上级代理">
-        <!-- && localStorage.roleid == 1 -->
         <el-select v-model="ruleForm.pid" clearable placeholder="请选择上级代理">
           <el-option v-for="item in options" :key="item.id" :label="item.username" :value="item.id"></el-option>
         </el-select>

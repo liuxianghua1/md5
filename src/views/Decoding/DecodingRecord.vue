@@ -38,8 +38,10 @@
       <el-table-column prop="updatetime" label="解码时间"></el-table-column>
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
-          <el-button size="medium" v-if="scope.row.status == 0" @click="download(scope.row)" type="primary">下载</el-button>
-          <el-link v-else type="primary" disabled >已下载</el-link>
+
+          <el-button size="medium" v-if="scope.row.status == 0 && scope.row.uid == id" @click="download(scope.row)" type="primary">下载</el-button>
+          <!-- <el-link v-else type="primary" disabled >您无权下载</el-link> -->
+          <el-link v-if="scope.row.status == 1" type="primary" disabled >已下载</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -59,6 +61,7 @@ let _ = require("lodash");
 export default {
   data() {
     return {
+      id: localStorage.id,
       tableData: [],
       pagination: {
         total: 1,
@@ -74,7 +77,7 @@ export default {
   methods: {
     download(row) {
       window.open(
-        `http://192.168.99.91:8080/xsl-decode/decodeRecode/downMd5.zul?id=${row.id}&uid=${localStorage.id}`
+        `http://192.168.0.100:8081/xsl-decode/decodeRecode/downMd5.zul?id=${row.id}&uid=${localStorage.id}`
       );
       this.fetch();
     },
@@ -136,7 +139,6 @@ export default {
           }
         }
       );
-      console.log(res);
       this.pagination.total = res.data.records;
       this.tableData = res.data.rows;
     },

@@ -89,7 +89,7 @@ export default {
         password: ""
       },
       form1: {
-        article: 1,
+        article: 1, //这边是钱的字段
         id: ""
       },
       formLabelWidth: "120px",
@@ -142,6 +142,8 @@ export default {
       }
     },
     async modifyArticle() {
+      // 金额 / 0.00197 向下取整
+      // console.log((this.form1.article / 0.00197))
       this.dialogFormVisible1 = false;
       const res = await this.$http.post("financial/invest.zul", this.form1);
       const money = await this.$http.post(
