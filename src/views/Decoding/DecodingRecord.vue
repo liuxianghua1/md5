@@ -22,6 +22,9 @@
         type="datetime"
         placeholder="选择解码结束时间"
       ></el-date-picker>
+      <el-select clearable class="search" v-model="username" placeholder="请选择被解码用户">
+        <el-option v-for="item in Username" :key="item.id" :label="item.username" :value="item.id"></el-option>
+      </el-select>
     </div>
     <el-table :data="tableData" style="width: 100%">
       <el-table-column
@@ -38,10 +41,14 @@
       <el-table-column prop="updatetime" label="解码时间"></el-table-column>
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
-
-          <el-button size="medium" v-if="scope.row.status == 0 && scope.row.uid == id" @click="download(scope.row)" type="primary">下载</el-button>
+          <el-button
+            size="medium"
+            v-if="scope.row.status == 0 && scope.row.uid == id"
+            @click="download(scope.row)"
+            type="primary"
+          >下载</el-button>
           <!-- <el-link v-else type="primary" disabled >您无权下载</el-link> -->
-          <el-link v-if="scope.row.status == 1" type="primary" disabled >已下载</el-link>
+          <el-link v-if="scope.row.status == 1" type="primary" disabled>已下载</el-link>
         </template>
       </el-table-column>
     </el-table>
@@ -63,6 +70,7 @@ export default {
     return {
       id: localStorage.id,
       tableData: [],
+      Username: [],
       pagination: {
         total: 1,
         page_size: 20,
@@ -70,12 +78,16 @@ export default {
       },
       decodename: "",
       starttime: "",
-      endtime: ""
+      endtime: "",
+      username: ""
     };
   },
 
   methods: {
     download(row) {
+      // window.open(
+      //   `http://192.168.99.91:8080/xsl-decode/decodeRecode/downMd5.zul?id=${row.id}&uid=${localStorage.id}`
+      // );
       window.open(
         `http://192.168.0.100:8081/xsl-decode/decodeRecode/downMd5.zul?id=${row.id}&uid=${localStorage.id}`
       );
@@ -94,6 +106,7 @@ export default {
             decodename: this.decodename,
             starttime: this.starttime,
             endtime: this.endtime,
+            uid: this.username,
             page
           },
           {
@@ -118,7 +131,7 @@ export default {
       this.pagination.total = res.data.records;
       this.tableData = res.data.rows;
     },
-    async fetch(decodename, starttime, endtime) {
+    async fetch(decodename, starttime, endtime, username) {
       let res;
       if (starttime == null) {
         this.starttime = "";
@@ -131,7 +144,8 @@ export default {
         {
           decodename: decodename,
           starttime: starttime,
-          endtime: endtime
+          endtime: endtime,
+          uid: username
         },
         {
           headers: {
@@ -147,22 +161,43 @@ export default {
         (this.pagination.page_index - 1) * this.pagination.page_size + index + 1
       );
     },
-    decodenameSearch: _.debounce(function(decodename, starttime, endtime) {
-      this.fetch(decodename, starttime, endtime);
-    }, 1000)
+    decodenameSearch: _.debounce(function(
+      decodename,
+      starttime,
+      endtime,
+      username
+    ) {
+      this.fetch(decodename, starttime, endtime, username);
+    },
+    1000),
+    async roleid_fetch() {
+      const res = await this.$http.post("user/childuser.zul", {
+        header: "application/json;charset=utf8"
+      });
+      this.Username = res.data.children;
+    }
   },
   created() {
     this.fetch();
+    this.roleid_fetch();
   },
   watch: {
     decodename: function(val) {
-      this.decodenameSearch(val, this.starttime, this.endtime);
+      this.decodenameSearch(val, this.starttime, this.endtime, this.username);
     },
     starttime: function(val) {
-      this.decodenameSearch(this.decodename, val, this.endtime);
+      this.decodenameSearch(this.decodename, val, this.endtime, this.username);
     },
     endtime: function(val) {
-      this.decodenameSearch(this.decodename, this.starttime, val);
+      this.decodenameSearch(
+        this.decodename,
+        this.starttime,
+        val,
+        this.username
+      );
+    },
+    username: function(val) {
+      this.decodenameSearch(this.decodename, this.starttime, this.endtime, val);
     }
   }
 };
